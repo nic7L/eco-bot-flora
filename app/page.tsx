@@ -91,7 +91,7 @@ function KnowledgeSection() {
   const [randomId, setRandomId] = useState(1)
   const topics = ['All', ...Array.from(new Set(knowledgeCards.map((card) => card.topic)))]
   const challengeCount = knowledgeCards.length
-  const surpriseCards = useMemo(() => knowledgeCards.slice(0, Math.max(1, knowledgeCards.length - 60)), [])
+  const surpriseCards = useMemo(() => knowledgeCards.slice(0, 5), [])
   useEffect(() => {
     try {
       setFavorites(JSON.parse(localStorage.getItem('eco-knowledge-favorites') || '[]'))
