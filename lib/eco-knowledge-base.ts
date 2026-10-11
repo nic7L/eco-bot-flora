@@ -32,3 +32,13 @@ export function findEcoAnswer(message: string) {
   const scored = ecoKnowledgeBase.map((entry) => ({ entry, score: entry.keywords.reduce((score, keyword) => score + (words.includes(keyword) ? 1 : 0), 0) })).sort((a, b) => b.score - a.score)
   return scored[0]?.score ? scored[0].entry : null
 }
+
+export function getEcoFallback(message: string): EcoKnowledgeEntry {
+  return {
+    topic: 'EcoBuddy guidance',
+    keywords: [],
+    answer: `That is a thoughtful question: “${message.trim()}” I can help you think through it using environmental facts and practical everyday choices. Start by considering the impact on air, water, soil, wildlife, energy, and waste, then choose the smallest realistic action that would reduce harm.`,
+    tip: 'Ask me to explain any environmental topic, compare greener choices, or suggest a practical action.',
+    related: ['What is climate change?', 'How can I reduce waste?'],
+  }
+}
