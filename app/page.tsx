@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, Bike, BookOpen, Bookmark, Check, ChevronLeft, CircleHelp, CloudSun, Droplets, Filter, Leaf, Lightbulb, Menu, RefreshCw, Recycle, RotateCcw, Search, ShoppingBag, Sparkles, Sprout, Star, Trash2, Trophy, Utensils, Waves, Wind, X, Zap } from 'lucide-react'
-import { findEcoAnswer, type EcoKnowledgeEntry } from '@/lib/eco-knowledge-base'
+import { findEcoAnswer, getEcoFallback, type EcoKnowledgeEntry } from '@/lib/eco-knowledge-base'
 
 type Screen = 'home' | 'quiz' | 'results'
 type Question = { icon: React.ComponentType<any>; category: string; question: string; options: string[]; tip: [string, string] }
@@ -94,7 +94,7 @@ function EcoBuddy() {
   const [messages, setMessages] = useState<{ from: 'bot' | 'user'; text: string; entry?: EcoKnowledgeEntry }[]>([{ from: 'bot', text: 'Hi, I am EcoBuddy. Ask me about climate, pollution, waste, water, biodiversity, energy, or Indian environmental laws.' }])
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
-  const ask = (question: string) => { if (!question.trim() || typing) return; const entry = findEcoAnswer(question); setInput(''); setMessages((current) => [...current, { from: 'user', text: question }, { from: 'bot', text: entry ? `${entry.answer} Practical tip: ${entry.tip}` : 'I do not have a clear answer for that yet. Try one of the topic suggestions below.', ...(entry ? { entry } : {}) }]); setTyping(true); window.setTimeout(() => setTyping(false), 450) }
+  const ask = (question: string) => { if (!question.trim() || typing) return; const entry = findEcoAnswer(question) || getEcoFallback(question); setInput(''); setMessages((current) => [...current, { from: 'user', text: question }, { from: 'bot', text: `${entry.answer} Practical tip: ${entry.tip}`, entry }]); setTyping(true); window.setTimeout(() => setTyping(false), 450) }
   return <section className="ecobuddy-section" id="chatbot"><div className="ecobuddy-heading"><div><p className="eyebrow"><Leaf size={14} /> CHAT WITH ECOBUDDY</p><h2>Chat with EcoBuddy for <em>greener choices.</em></h2><p>A simple rule-based guide for everyday environmental questions. No login or paid API required.</p></div><button className="clear-chat" onClick={() => setMessages([{ from: 'bot', text: 'Chat cleared. What environmental question can I help with?' }])}>Clear chat</button></div><div className="ecobuddy-card"><div className="ecobuddy-messages">{messages.map((message, index) => <div className={`eco-message ${message.from}`} key={`${message.text}-${index}`}><span className="eco-avatar"><Leaf size={14} /></span><div><p>{message.text}</p>{message.entry && <div className="related-chips">{message.entry.related.map((related) => <button key={related} onClick={() => ask(related)}>{related}</button>)}</div>}</div></div>)}{typing && <div className="eco-message bot"><span className="eco-avatar"><Leaf size={14} /></span><div className="typing"><i /><i /><i /></div></div>}</div><div className="eco-suggestions">{suggestions.map((suggestion) => <button key={suggestion} onClick={() => ask(suggestion)}>{suggestion}</button>)}</div><form className="eco-composer" onSubmit={(event) => { event.preventDefault(); ask(input) }}><input aria-label="Ask EcoBuddy" value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask EcoBuddy anything environmental..." /><button type="submit" aria-label="Send question"><ArrowRight /></button></form></div></section>
 }
 
